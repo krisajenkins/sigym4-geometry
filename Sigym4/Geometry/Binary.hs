@@ -1,5 +1,6 @@
 {-# LANGUAGE RecordWildCards
            , FlexibleContexts
+           , BangPatterns
            , FlexibleInstances
            , KindSignatures
            , DataKinds
@@ -167,7 +168,7 @@ instance Decodable 'MultiPoint where
   geomtype _ = MultiPoint
   decodeBody bo = runGet' $ do
     nPoints <- getIntBo bo
-    MkMultiPoint <$> V.replicateM nPoints
+    MkMultiPoint . V.fromList <$> replicateM' nPoints
                      (getHeader >>= \(bo',_,_) -> decodePoint bo')
 
 
@@ -183,14 +184,14 @@ instance Decodable 'MultiLineString where
   geomtype _ = MultiLineString
   decodeBody bo = runGet' $ do
     nLineStrings <- getIntBo bo
-    MkMultiLineString <$> V.replicateM nLineStrings
+    MkMultiLineString . V.fromList <$> replicateM' nLineStrings
       (getHeader >>= \(bo',_,_) -> decodeLineString bo')
 
 
 decodeLinearRing :: BinaryBO (v Double) => ByteOrder -> Get (LinearRing v)
 decodeLinearRing bo = do
   nPoints <- getIntBo bo
-  U.replicateM  nPoints (getBo bo)
+  U.fromList <$> replicateM'  nPoints (getBo bo)
 
 instance Decodable 'Polygon where
   geomtype _ = Polygon
@@ -200,13 +201,13 @@ decodePolygon :: (IsVertex v Double, BinaryBO (v Double))
   => ByteOrder -> Get (Geometry Polygon v)
 decodePolygon bo = do
     nRings <- getIntBo bo
-    MkPolygon <$> V.replicateM nRings (decodeLinearRing bo)
+    MkPolygon . V.fromList <$> replicateM' nRings (decodeLinearRing bo)
 
 instance Decodable 'MultiPolygon where
   geomtype _ = MultiPolygon
   decodeBody bo = runGet' $ do
     nPolys <- getIntBo bo
-    MkMultiPolygon <$> V.replicateM nPolys
+    MkMultiPolygon . V.fromList <$> replicateM' nPolys
       (getHeader >>= \(bo',_,_) -> decodePolygon bo')
 
 
@@ -231,3 +232,13 @@ instance BinaryBO (V3 Double) where
                      >> putDoubleBo bo z
   {-# INLINE getBo #-}
   {-# INLINE putBo #-}
+
+replicateM' :: Int -> Get a -> Get [a]
+replicateM' n' op = go n' []
+  where
+    go 0 acc = return $! reverse acc
+    go !n acc = do
+      x <- op
+      go (n-1) (x:acc)
+{-# INLINE replicateM' #-}
+
