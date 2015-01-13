@@ -284,10 +284,6 @@ deriving instance VectorSpace v => Eq (Point v)
 pointCoordinates :: VectorSpace v => Point v -> [Double]
 pointCoordinates = toList . _pVertex
 
-derivingUnbox "Point"
-    [t| VectorSpace v => Point v -> Vertex v |]
-    [| \(Point v) -> v |]
-    [| \v -> Point v|]
 
 newtype LinearRing v = LinearRing {_lrPoints :: V.Vector (Point v)}
     deriving (Eq, Show)
