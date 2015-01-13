@@ -80,7 +80,7 @@ type Vertex v = v Double
 type SqMatrix v = v (Vertex v)
 
 -- | A vector space
-class ( Num (Vertex v), Show (Vertex v), Eq (Vertex v)
+class ( Num (Vertex v), Show (Vertex v), Eq (Vertex v), U.Unbox (Vertex v)
       , Show (v Int), Eq (v Int) --XXX
       , Num (SqMatrix v), Show (SqMatrix v), Eq (SqMatrix v)
       , Applicative v, Additive v, Foldable v, Trace v)
@@ -283,6 +283,11 @@ deriving instance VectorSpace v => Eq (Point v)
 
 pointCoordinates :: VectorSpace v => Point v -> [Double]
 pointCoordinates = toList . _pVertex
+
+derivingUnbox "Point"
+    [t| VectorSpace v => Point v -> Vertex v |]
+    [| \(Point v) -> v |]
+    [| \v -> Point v|]
 
 newtype LinearRing v = LinearRing {_lrPoints :: V.Vector (Point v)}
     deriving (Eq, Show)
