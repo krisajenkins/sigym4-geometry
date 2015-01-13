@@ -80,7 +80,7 @@ type Vertex v = v Double
 type SqMatrix v = v (Vertex v)
 
 -- | A vector space
-class ( Num (Vertex v), Show (Vertex v), Eq (Vertex v), U.Unbox (Vertex v)
+class ( Num (Vertex v), Show (Vertex v), Eq (Vertex v)
       , Show (v Int), Eq (v Int) --XXX
       , Num (SqMatrix v), Show (SqMatrix v), Eq (SqMatrix v)
       , Applicative v, Additive v, Foldable v, Trace v)
@@ -284,18 +284,13 @@ deriving instance VectorSpace v => Eq (Point v)
 pointCoordinates :: VectorSpace v => Point v -> [Double]
 pointCoordinates = toList . _pVertex
 
-derivingUnbox "Point"
-    [t| VectorSpace v => Point v -> Vertex v |]
-    [| \(Point v) -> v |]
-    [| \v -> Point v|]
-
-newtype LinearRing v = LinearRing {_lrPoints :: U.Vector (Point v)}
+newtype LinearRing v = LinearRing {_lrPoints :: V.Vector (Point v)}
     deriving (Eq, Show)
 
 linearRingCoordinates :: VectorSpace v => LinearRing v -> [[Double]]
 linearRingCoordinates = vectorCoordinates . _lrPoints
 
-newtype LineString v = LineString {_lsPoints :: U.Vector (Point v)}
+newtype LineString v = LineString {_lsPoints :: V.Vector (Point v)}
     deriving (Eq, Show)
 
 lineStringCoordinates :: VectorSpace v => LineString v -> [[Double]]
@@ -311,7 +306,7 @@ polygonCoordinates (Polygon ir rs)
   = V.toList . V.cons (linearRingCoordinates ir) $
     V.map linearRingCoordinates rs
 
-vectorCoordinates :: VectorSpace v => U.Vector (Point v) -> [[Double]]
+vectorCoordinates :: VectorSpace v => V.Vector (Point v) -> [[Double]]
 vectorCoordinates = V.toList . V.map pointCoordinates . V.convert
 
 data Geometry v
@@ -327,15 +322,15 @@ data Geometry v
 
 mkLineString :: VectorSpace v => [Point v] -> Maybe (LineString v)
 mkLineString ls
-  | U.length v >= 2 = Just $ LineString v
+  | V.length v >= 2 = Just $ LineString v
   | otherwise = Nothing
-  where v = U.fromList ls
+  where v = V.fromList ls
 
 mkLinearRing :: VectorSpace v => [Point v] -> Maybe (LinearRing v)
 mkLinearRing ls
-  | U.length v >= 4, U.last v == U.head v = Just $ LinearRing v
+  | V.length v >= 4, V.last v == V.head v = Just $ LinearRing v
   | otherwise = Nothing
-  where v = U.fromList ls
+  where v = V.fromList ls
 
 mkPolygon :: [LinearRing v] -> Maybe (Polygon v)
 mkPolygon (oRing:rings) = Just $ Polygon oRing $ V.fromList rings
