@@ -1,4 +1,6 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, StandaloneDeriving, CPP #-}
+{-# LANGUAGE CPP                        #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE StandaloneDeriving         #-}
 module Sigym4.Geometry.Arrow (
     FeatureArrow
   , arr -- ^ Constructs a 'FeatureArrow' from a pure function (a -> b)
@@ -7,16 +9,10 @@ module Sigym4.Geometry.Arrow (
   , mapFA
 ) where
 
-import Control.Arrow (Arrow, Kleisli(..), arr)
-import Control.Category (Category)
-import Control.Monad.Reader (Reader, MonadReader(ask), runReader)
-#if MIN_VERSION_base(4,8,0)
-import Control.Applicative ((<$>))
-#else
-import Control.Applicative (pure, (<$>), (<*>))
-#endif
-
-import Sigym4.Geometry.Types (Geometry, Feature, _fGeom)
+import           Control.Arrow         (Arrow, Kleisli (..), arr)
+import           Control.Category      (Category)
+import           Control.Monad.Reader  (MonadReader (ask), Reader, runReader)
+import           Sigym4.Geometry.Types (Feature, Geometry, _fGeom)
 
 -- | A 'FeatureArrow' is an 'Arrow' that maps 'a's to 'b's which have an
 --   associated read-only 'Geometry' of type 't' and vertex 'v'
@@ -40,4 +36,4 @@ runFA (FeatureArrow (Kleisli f)) feat
 
 -- | Maps a 'FeatureArrow' over a 'Functor'
 mapFA :: Functor f => FeatureArrow t v a b -> f (Feature t v a) ->  f (Feature t v b)
-mapFA = fmap . runFA 
+mapFA = fmap . runFA

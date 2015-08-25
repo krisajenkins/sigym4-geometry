@@ -1,18 +1,17 @@
-{-# LANGUAGE StandaloneDeriving
-           , DataKinds
-           , TypeFamilies
-           , GeneralizedNewtypeDeriving
-           , TemplateHaskell
-           , MultiParamTypeClasses
-           , FlexibleContexts
-           , FlexibleInstances
-           , TypeSynonymInstances
-           , RankNTypes
-           , CPP
-           , KindSignatures
-           , DeriveFunctor
-           , ScopedTypeVariables
-           #-}
+{-# LANGUAGE CPP                        #-}
+{-# LANGUAGE DataKinds                  #-}
+{-# LANGUAGE DeriveFunctor              #-}
+{-# LANGUAGE FlexibleContexts           #-}
+{-# LANGUAGE FlexibleInstances          #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE KindSignatures             #-}
+{-# LANGUAGE MultiParamTypeClasses      #-}
+{-# LANGUAGE RankNTypes                 #-}
+{-# LANGUAGE ScopedTypeVariables        #-}
+{-# LANGUAGE StandaloneDeriving         #-}
+{-# LANGUAGE TemplateHaskell            #-}
+{-# LANGUAGE TypeFamilies               #-}
+{-# LANGUAGE TypeSynonymInstances       #-}
 module Sigym4.Geometry.Types (
     Geometry (..)
   , LineString (..)
@@ -105,28 +104,21 @@ module Sigym4.Geometry.Types (
   , module V3
 ) where
 
-import Prelude hiding (product)
-#if MIN_VERSION_base(4,8,0)
-import Control.Applicative ((<$>))
-#else
-import Control.Applicative (Applicative, pure, (<$>), (<*>))
-import Data.Foldable (Foldable)
-import Data.Monoid (Monoid(..))
-#endif
-import Control.Lens
-import Data.Proxy (Proxy(..))
-import Data.Maybe (fromMaybe)
-import qualified Data.Semigroup as SG
-import Data.Foldable (product)
-import qualified Data.Vector as V
-import qualified Data.Vector.Generic as GV
-import qualified Data.Vector.Unboxed as U
-import Data.Vector.Unboxed.Deriving (derivingUnbox)
-import Linear.V2 as V2
-import Linear.V3 as V3
-import Linear.Matrix ((!*), (*!), inv22, inv33)
-import Linear.Metric (Metric)
-import GHC.TypeLits
+import           Control.Lens
+import           Data.Foldable                (product)
+import           Data.Maybe                   (fromMaybe)
+import           Data.Proxy                   (Proxy (..))
+import qualified Data.Semigroup               as SG
+import qualified Data.Vector                  as V
+import qualified Data.Vector.Generic          as GV
+import qualified Data.Vector.Unboxed          as U
+import           Data.Vector.Unboxed.Deriving (derivingUnbox)
+import           GHC.TypeLits
+import           Linear.Matrix                (inv22, inv33, (!*), (*!))
+import           Linear.Metric                (Metric)
+import           Linear.V2                    as V2
+import           Linear.V3                    as V3
+import           Prelude                      hiding (product)
 
 -- | A vertex
 type Vertex v = v Double
@@ -300,7 +292,7 @@ scalarSize = product . unSize
 -- A GeoTransform defines how we translate from geographic 'Vertex'es to
 -- 'Pixel' coordinates and back. gtMatrix *must* be inversible so smart
 -- constructors are provided
-data GeoTransform v (srid :: Nat) = GeoTransform 
+data GeoTransform v (srid :: Nat) = GeoTransform
       { gtMatrix :: !(SqMatrix v)
       , gtOrigin :: !(Vertex v)
       }
@@ -335,7 +327,7 @@ gtBackward gt p = Point $ v0 + (unPx p) *! m
   where m  = gtMatrix gt
         v0 = gtOrigin gt
 
-data GeoReference v srid = GeoReference 
+data GeoReference v srid = GeoReference
       { grTransform :: GeoTransform v srid
       , grSize      :: Size v
       }
@@ -415,7 +407,7 @@ derivingUnbox "Triangle"
 
 data Polygon v srid = Polygon {
     _pOuterRing :: LinearRing v srid
-  , _pRings     :: V.Vector (LinearRing v srid) 
+  , _pRings     :: V.Vector (LinearRing v srid)
 } deriving (Eq, Show)
 makeLenses ''Polygon
 

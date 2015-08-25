@@ -11,9 +11,6 @@ module Sigym4.Geometry.Algorithms (
   , HasPredicates(..)
 ) where
 
-#if !MIN_VERSION_base(4,8,0)
-import Control.Applicative (pure)
-#endif
 import Sigym4.Geometry.Types
 import qualified Data.Vector as V
 import qualified Data.Vector.Unboxed as U

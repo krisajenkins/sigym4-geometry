@@ -1,22 +1,20 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
-{-# LANGUAGE FlexibleContexts
-           , FlexibleInstances
-           , ScopedTypeVariables
-           , OverloadedStrings
-           #-}
+{-# LANGUAGE FlexibleContexts    #-}
+{-# LANGUAGE FlexibleInstances   #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 module Sigym4.Geometry.Json (
     jsonEncode
   , jsonDecode
   ) where
 
-import Control.Applicative
-import Data.Aeson
-import Data.Text (Text, unpack)
-import Data.Aeson.Types (Parser, Pair)
-import Sigym4.Geometry.Types
-import Data.ByteString.Lazy (ByteString)
-import qualified Data.Vector as V
-import qualified Data.Vector.Unboxed as U
+import           Data.Aeson
+import           Data.Aeson.Types      (Pair, Parser)
+import           Data.ByteString.Lazy  (ByteString)
+import           Data.Text             (Text, unpack)
+import qualified Data.Vector           as V
+import qualified Data.Vector.Unboxed   as U
+import           Sigym4.Geometry.Types
 
 jsonEncode :: (VectorSpace v)
            => Geometry v srid -> ByteString
@@ -136,7 +134,7 @@ instance VectorSpace v => FromJSON (Geometry v srid) where
     parseJSON _ = fail "parseJSON(Geometry): Expected an object"
     {-# INLINEABLE parseJSON  #-}
 
-        
+
 
 instance (ToJSON (Geometry v srid), ToJSON d) => ToJSON (Feature v srid d) where
     toJSON (Feature g ps) = typedObject "Feature" ["geometry"    .= g
