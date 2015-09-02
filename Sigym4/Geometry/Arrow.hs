@@ -3,7 +3,7 @@
 {-# LANGUAGE StandaloneDeriving         #-}
 module Sigym4.Geometry.Arrow (
     FeatureArrow
-  , arr -- ^ Constructs a 'FeatureArrow' from a pure function (a -> b)
+  , arr
   , mkFA
   , runFA
   , mapFA
