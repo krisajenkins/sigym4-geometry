@@ -66,6 +66,17 @@ test-suite main
                    , aeson
                    , text
   hs-source-dirs:    tests .
+  other-modules:      Arbitrary
+                    , Sigym4.Geometry
+                    , Sigym4.Geometry.Arrow
+                    , Sigym4.Geometry.Binary
+                    , Sigym4.Geometry.BinarySpec
+                    , Sigym4.Geometry.Rasterize
+                    , Sigym4.Geometry.Json
+                    , Sigym4.Geometry.JsonSpec
+                    , Sigym4.Geometry.Types
+                    , Sigym4.Geometry.TypesSpec
+                    , Sigym4.GeometrySpec
   main-is:           Spec.hs
   default-language:  Haskell2010
   ghc-options:       -Wall -threaded
